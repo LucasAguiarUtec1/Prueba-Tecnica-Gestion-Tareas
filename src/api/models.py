@@ -31,3 +31,9 @@ class Task(db.Model):
     label: Mapped[str]
     completed: Mapped[bool]
     user_id: Mapped[int] = mapped_column(ForeignKey("User.id"))
+
+class Blacklist(db.Model):
+    __tablename__ = "Blacklist"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    jti: Mapped[str] = mapped_column(unique=True)
