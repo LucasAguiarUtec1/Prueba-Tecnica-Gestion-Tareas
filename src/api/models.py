@@ -11,6 +11,7 @@ class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     username: Mapped[str] = mapped_column(unique=True)
     email: Mapped[str]
+    password: Mapped[str]
     tasks: Mapped[List["Task"]] = relationship()
 
     def __repr__(self):
