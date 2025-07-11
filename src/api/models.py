@@ -1,12 +1,17 @@
+from typing import List
 from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy import ForeignKey
 
 db = SQLAlchemy()
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(80), unique=False, nullable=False)
-    is_active = db.Column(db.Boolean(), unique=False, nullable=False)
+    __tablename__ = "User"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    username: Mapped[str] = mapped_column(unique=True)
+    email: Mapped[str]
+    tasks: Mapped[List["Task"]] = relationship()
 
     def __repr__(self):
         return f'<User {self.email}>'
@@ -14,6 +19,14 @@ class User(db.Model):
     def serialize(self):
         return {
             "id": self.id,
+            "username": self.username,
             "email": self.email,
-            # do not serialize the password, its a security breach
         }
+    
+class Task(db.Model):
+    __tablename__ = "Task"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    label: Mapped[str]
+    completed: Mapped[bool]
+    user_id: Mapped[int] = mapped_column(ForeignKey("User.id"))
