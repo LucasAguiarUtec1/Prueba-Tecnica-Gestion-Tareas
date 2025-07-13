@@ -20,10 +20,47 @@ const getState = ({ getStore, getActions, setStore }) => {
 			exampleFunction: () => {
 				getActions().changeColor(0, "green");
 			},
+			register: async (email, username, password) => {
+				const resp = await fetch(process.env.BACKEND_URL + "/api/register", {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						"username": username,
+						"email": email,
+						"password": password
+					})
+				});
 
+				const data = await resp.json();
+				if (!resp.ok) {
+					throw new Error(data.error);
+				}
+				return data.message
+			},
+			login: async(email, password) => {
+				const resp = await fetch(process.env.BACKEND_URL + "/api/login", {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify({
+						"email": email,
+						"password": password
+					})
+				});
+				const data = await resp.json();
+
+				if(!resp.ok) {
+					throw new Error(data.error);
+				}
+				return data;
+			},
 			getMessage: async () => {
 				try{
-					// fetching data from the backend
+					// fetching data from the backend\
+					console.log('URL BACKEND: ' + process.env.BACKEND_URL);
 					const resp = await fetch(process.env.BACKEND_URL + "/api/hello")
 					const data = await resp.json()
 					setStore({ message: data.message })
