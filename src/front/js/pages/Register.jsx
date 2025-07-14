@@ -1,6 +1,5 @@
 import React, { useState, useContext, useRef } from "react";
 import { Context } from "../store/appContext";
-import 'bootstrap/dist/js/bootstrap.bundle.min.js';
 import { useNavigate } from "react-router-dom";
 
 
@@ -19,6 +18,7 @@ const Register = () => {
     const [errors, setErrors] = useState({
         "email": "", "password": "", "username": "", "repeatPassword": ""
     })
+    const [disabledButton, setDisabledButton] = useState(false);
 
     const handleSubmitForm = async (e) => {
         e.preventDefault();
@@ -52,6 +52,7 @@ const Register = () => {
         setErrors(newErrors);
 
         if (valid) {
+            setDisabledButton(true);
             try {
                 const message = await actions.register(email, username, password);
 
@@ -59,11 +60,13 @@ const Register = () => {
                 setMessageSucces(message);
                 toast.show();
                 setSuccessRegister(true);
+                setDisabledButton(false);
             } catch (error) {
                 console.error("Error en registro", error)
                 setErrorMessage(error.message);
                 const toast = new bootstrap.Toast(toastRefError.current);
                 toast.show();
+                setDisabledButton(false);
             }
         }
 
@@ -130,7 +133,7 @@ const Register = () => {
                                 {errors.repeatPassword}.
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-outline-primary mx-auto mt-3">Registrarme</button>
+                        <button disabled={disabledButton} type="submit" className="btn btn-outline-primary mx-auto mt-3">Registrarme</button>
                         </div>
                     </form>
                 </div>

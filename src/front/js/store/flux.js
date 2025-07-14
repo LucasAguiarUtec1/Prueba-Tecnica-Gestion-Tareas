@@ -57,6 +57,79 @@ const getState = ({ getStore, getActions, setStore }) => {
 				}
 				return data;
 			},
+			getTasks: async(token) => {
+				const resp = await fetch(process.env.BACKEND_URL + `/api/tasks`, {
+					method: 'GET',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					}
+				});
+
+				const data = await resp.json();
+				
+				if (!resp.ok) {
+					throw new Error(data.error);
+				}
+				return data.tasks;
+			},
+			addTask: async (email, label, token) => {
+				const resp = await fetch(process.env.BACKEND_URL + `/api/tasks`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+					body: JSON.stringify({
+						"email": email,
+						"label": label
+					})
+				});
+
+				const data = await resp.json();
+				if (!resp.ok) {
+					throw new Error(data.error);
+				}
+
+				return data.task;
+			}
+			,
+			deleteTask: async(taskId, token) => {
+				const resp = await fetch(process.env.BACKEND_URL + `/api/tasks/${taskId}`, {
+					method: 'DELETE',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					}
+				});
+
+				const data = await resp.json();
+				if (!resp.ok) {
+					throw new Error(data.error);
+				}
+				return data.message;
+			}
+			,
+			updateTask: async (label, completed ,taskId, token) => {
+				const resp = await fetch(process.env.BACKEND_URL + `/api/tasks/${taskId}`, {
+					method: 'PUT',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					},
+					body: JSON.stringify({
+						'label': label !== '' ? label : "",
+						'completed': completed
+					})
+				});
+
+				const data = await resp.json();
+				if (!resp.ok) {
+					throw new Error(data.error);
+				}
+				return data.message;
+			}
+			,
 			getMessage: async () => {
 				try{
 					// fetching data from the backend\

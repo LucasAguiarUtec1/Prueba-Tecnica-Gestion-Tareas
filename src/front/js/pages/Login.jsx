@@ -14,6 +14,8 @@ const Login = () => {
     const [errors, setErrors] = useState({
         "email": "", "password": ""
     })
+    const [disabledButton, setDisabledButton] = useState(false);
+
 
     const handleSubmitForm = async (e) => {
         e.preventDefault();
@@ -32,15 +34,19 @@ const Login = () => {
         setErrors(newErrors);
 
         if (valid) {
+            setDisabledButton(true);
             try {
                 const data = await actions.login(email, password);
                 localStorage.setItem('acces_token', data.acces_token);
                 localStorage.setItem('user', JSON.stringify(data.user));
+                setDisabledButton(false);
+                navigate('/tasks')
             } catch (error) {
                 console.error("Error al iniciar sesion", error)
                 setErrorMessage(error.message);
                 const toast = new bootstrap.Toast(toastRef.current);
                 toast.show();
+                setDisabledButton(false);
             }
         }
 
@@ -82,8 +88,8 @@ const Login = () => {
                                 {errors.password}.
                             </div>
                         </div>
-                        <button type="submit" className="btn btn-outline-primary mx-auto mb-2">Iniciar Sesion</button>
-                        <a href="#" onClick={() => navigate('/register')} className="link-primary mx-auto mb-2">¿Aun no estas registrado? Registrate Aqui</a>
+                        <button type="submit" disabled={disabledButton} className="btn btn-outline-primary mx-auto mb-2">Iniciar Sesion</button>
+                        <a href="#" dis onClick={() => navigate('/register')} className="link-primary mx-auto mb-2">¿Aun no estas registrado? Registrate Aqui</a>
                         <a href="#" className="link-primary mx-auto mb-2">Olvide mi contraseña</a>
                         </div>
                     </form>
