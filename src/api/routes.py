@@ -6,7 +6,7 @@ from api.models import db, User, Task, Blacklist
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from api.utils import bcrypt
-from flask_jwt_extended import create_access_token, get_jwt, jwt_required
+from flask_jwt_extended import create_access_token, get_jwt, jwt_required, get_jwt_identity
 from sqlalchemy.orm import Bundle
 from sqlalchemy import select, update
 
@@ -70,7 +70,7 @@ def login():
     if not usuario or not bcrypt.check_password_hash(usuario.password, password):
         return jsonify({"error":"Credenciales incorrectas"}), 401
     
-    access_token = create_access_token(identity=usuario.username)
+    access_token = create_access_token(identity=usuario.email)
 
     return jsonify({"user": usuario.serialize(), "acces_token": access_token}), 200
 
@@ -114,17 +114,14 @@ def create_task():
     db.session.add(task)
     db.session.commit()
 
-    return jsonify({"message": "Tarea creada"}), 200
+    return jsonify({"task": task.serialize()}), 200
 
 @api.route('/tasks', methods=['GET'])
 @jwt_required()
 def get_user_tasks():
-    data = request.get_json()
-
-    if not data or 'email' not in data:
+    email = get_jwt_identity()
+    if not  email:
         return jsonify({"error": "Faltan datos para obtener tareas de usuario"}), 400
-    
-    email = data.get("email")
 
     usuario = User.query.filter_by(email=email).first()
 
@@ -145,6 +142,8 @@ def get_user_tasks():
 @api.route('/tasks/<int:id>', methods=['PUT'])
 @jwt_required()
 def update_task_status(id):
+    
+    data = request.get_json()
 
     if not id:
         return jsonify({"error": "Faltan datos para poder actualizar la tarea"}), 400
@@ -152,14 +151,15 @@ def update_task_status(id):
     if not Task.query.filter_by(id=id).first():
         return jsonify({"error": "La tarea no existe"}), 404
     
-    result = db.session.execute(
-        update(Task)
-        .where(Task.id==id)
-        .values(completed=True)
-    )
-    if result.rowcount == 0:
+    task = Task.query.filter_by(id=id).first()
+    print(f'Completed: {data.get("completed")}')
+    if not task:
         return({"error": "Tarea no encontrada"}), 404
     else:
+        task.completed = data.get('completed')
+        if data and 'label' in data and data.get('label') != '':
+            task.label = data.get('label')
+        db.session.add(task)
         db.session.commit()
         return jsonify({"message": "Tarea actualizada"}), 200
 

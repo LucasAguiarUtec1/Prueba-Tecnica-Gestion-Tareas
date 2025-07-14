@@ -32,6 +32,13 @@ class Task(db.Model):
     completed: Mapped[bool]
     user_id: Mapped[int] = mapped_column(ForeignKey("User.id"))
 
+    def serialize(self):
+        return {
+            "id": self.id,
+            "label": self.label,
+            "completed": self.completed
+        }
+
 class Blacklist(db.Model):
     __tablename__ = "Blacklist"
 
