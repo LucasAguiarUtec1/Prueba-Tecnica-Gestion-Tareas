@@ -1,12 +1,22 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import { Context } from "../store/appContext";
 
 export const Navbar = () => {
+    const { store, actions } = useContext(Context);
     const navigate = useNavigate();
-    const handleLogut = () => {
-        localStorage.clear();
-        navigate('/login');
+    const handleLogut = async () => {
+        try {
+            const resp = await actions.logout(localStorage.getItem('acces_token'));
+            localStorage.clear();
+            navigate('/login');
+        } catch (error) {
+            console.error("Error al cerrar session", error);
+            localStorage.clear();
+            navigate('/login');
+        }
+        
     }
     
 	return (

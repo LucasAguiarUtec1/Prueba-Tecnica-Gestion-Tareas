@@ -130,6 +130,22 @@ const getState = ({ getStore, getActions, setStore }) => {
 				return data.message;
 			}
 			,
+			logout: async (token) => {
+				const resp = await fetch(process.env.BACKEND_URL + '/api/logout', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+						'Authorization': `Bearer ${token}`
+					}
+				})
+
+				const data = await resp.json();
+				if (!resp.ok) {
+					throw new Error("Ocurrio un error al cerrar la session");
+				}
+				return data.message;
+			}
+			,
 			getMessage: async () => {
 				try{
 					// fetching data from the backend\

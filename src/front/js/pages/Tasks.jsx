@@ -56,7 +56,7 @@ const Tasks = () => {
     }, [tasks]);
 
     useEffect(() => {
-        if (editingTask === null) return;
+        if (editingTask === null || editingTask < 0 || actualTaskValue === "") return;
         const updatetask = async (refInput) => {
             refInput.current.disabled = true;
             try {
@@ -92,7 +92,7 @@ const Tasks = () => {
         return () => {
             document.removeEventListener("mousedown", handleClickOutsideInput);
         };
-    }, [editingTask, actualTaskValue, actions, inputRef, toastRef, toastRefError]);
+    }, [editingTask, actualTaskValue]);
 
 
     const handleCreateTask = async () => {
